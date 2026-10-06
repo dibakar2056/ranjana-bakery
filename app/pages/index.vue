@@ -13,7 +13,12 @@
     <p class="mt-3 max-w-xl text-lg text-muted">
       Fresh cakes, bread, and cafe favorites from our kitchen.
     </p>
-    <UButton to="/admin/login" class="mt-8" color="neutral" variant="soft">
+    <UButton
+      to="/admin/login"
+      class="mt-8"
+      color="neutral"
+      variant="soft"
+    >
       Staff sign in
     </UButton>
   </section>

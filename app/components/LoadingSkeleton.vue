@@ -3,7 +3,10 @@ withDefaults(defineProps<{ lines?: number }>(), { lines: 3 })
 </script>
 
 <template>
-  <div class="space-y-3" aria-hidden="true">
+  <div
+    class="space-y-3"
+    aria-hidden="true"
+  >
     <div
       v-for="line in lines"
       :key="line"

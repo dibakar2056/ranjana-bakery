@@ -218,8 +218,20 @@ async function setStatus(user: UserRow) {
 <template>
   <section class="p-4 sm:p-6 lg:p-8">
     <PageHeader title="Users">
-      <UInput v-model="query.search" icon="i-lucide-search" placeholder="Search name, username, or email" aria-label="Search users" color="neutral" variant="outline" class="w-full sm:w-72" />
-      <UButton v-if="canCreate" icon="i-lucide-plus" @click="openAdd">
+      <UInput
+        v-model="query.search"
+        icon="i-lucide-search"
+        placeholder="Search name, username, or email"
+        aria-label="Search users"
+        color="neutral"
+        variant="outline"
+        class="w-full sm:w-72"
+      />
+      <UButton
+        v-if="canCreate"
+        icon="i-lucide-plus"
+        @click="openAdd"
+      >
         Add
       </UButton>
     </PageHeader>
@@ -232,7 +244,10 @@ async function setStatus(user: UserRow) {
       :description="query.search ? 'Try a different name, username, or email.' : 'Staff accounts you invite will show up here.'"
       @action="openAdd"
     />
-    <div v-else class="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
+    <div
+      v-else
+      class="overflow-hidden rounded-2xl border border-line bg-surface shadow-card"
+    >
       <div class="overflow-x-auto">
         <table class="w-full table-fixed border-collapse text-left">
           <colgroup>
@@ -248,15 +263,34 @@ async function setStatus(user: UserRow) {
           </colgroup>
           <thead>
             <tr class="border-b border-line bg-canvas/70 text-xs font-medium tracking-wide text-ink-muted uppercase">
-              <th class="px-3 py-2.5 font-medium whitespace-nowrap">SN</th>
-              <th class="px-3 py-2.5 font-medium whitespace-nowrap">Name</th>
-              <th class="px-3 py-2.5 font-medium whitespace-nowrap">Username</th>
-              <th class="px-3 py-2.5 font-medium whitespace-nowrap">Role</th>
-              <th class="px-3 py-2.5 font-medium whitespace-nowrap">Email</th>
-              <th class="px-3 py-2.5 font-medium whitespace-nowrap">Phone</th>
-              <th class="px-3 py-2.5 font-medium whitespace-nowrap">Status</th>
-              <th class="w-full p-0" aria-hidden="true" />
-              <th class="px-3 py-2.5 font-medium whitespace-nowrap">Actions</th>
+              <th class="px-3 py-2.5 font-medium whitespace-nowrap">
+                SN
+              </th>
+              <th class="px-3 py-2.5 font-medium whitespace-nowrap">
+                Name
+              </th>
+              <th class="px-3 py-2.5 font-medium whitespace-nowrap">
+                Username
+              </th>
+              <th class="px-3 py-2.5 font-medium whitespace-nowrap">
+                Role
+              </th>
+              <th class="px-3 py-2.5 font-medium whitespace-nowrap">
+                Email
+              </th>
+              <th class="px-3 py-2.5 font-medium whitespace-nowrap">
+                Phone
+              </th>
+              <th class="px-3 py-2.5 font-medium whitespace-nowrap">
+                Status
+              </th>
+              <th
+                class="w-full p-0"
+                aria-hidden="true"
+              />
+              <th class="px-3 py-2.5 font-medium whitespace-nowrap">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -266,7 +300,9 @@ async function setStatus(user: UserRow) {
               class="border-b border-line transition-colors duration-200 last:border-b-0 hover:bg-brand-50/50"
               :class="isSelf(user) ? 'bg-brand-50/30' : ''"
             >
-              <td class="px-3 py-3 align-middle text-sm text-ink-muted">{{ serial(index) }}</td>
+              <td class="px-3 py-3 align-middle text-sm text-ink-muted">
+                {{ serial(index) }}
+              </td>
               <td class="px-3 py-3 align-middle">
                 <div class="flex min-w-0 items-center gap-3">
                   <span class="grid size-10 shrink-0 place-items-center rounded-full bg-brand-500 text-sm font-semibold text-white">
@@ -274,15 +310,28 @@ async function setStatus(user: UserRow) {
                   </span>
                   <p class="flex min-w-0 items-center gap-2 font-medium text-ink">
                     <span class="truncate">{{ user.displayName }}</span>
-                    <span v-if="isSelf(user)" class="shrink-0 rounded-md bg-brand-100 px-1.5 py-0.5 text-[11px] font-medium tracking-wide text-brand-800 uppercase">You</span>
+                    <span
+                      v-if="isSelf(user)"
+                      class="shrink-0 rounded-md bg-brand-100 px-1.5 py-0.5 text-[11px] font-medium tracking-wide text-brand-800 uppercase"
+                    >You</span>
                   </p>
                 </div>
               </td>
               <td class="px-3 py-3 align-middle text-sm text-ink">
                 <div class="flex min-w-0 items-center gap-1">
-                  <p class="truncate">{{ user.username }}</p>
+                  <p class="truncate">
+                    {{ user.username }}
+                  </p>
                   <UTooltip text="Copy username">
-                    <UButton icon="i-lucide-copy" color="neutral" variant="ghost" size="xs" class="shrink-0" aria-label="Copy username" @click="copyUsername(user.username)" />
+                    <UButton
+                      icon="i-lucide-copy"
+                      color="neutral"
+                      variant="ghost"
+                      size="xs"
+                      class="shrink-0"
+                      aria-label="Copy username"
+                      @click="copyUsername(user.username)"
+                    />
                   </UTooltip>
                 </div>
               </td>
@@ -292,21 +341,45 @@ async function setStatus(user: UserRow) {
                 </span>
               </td>
               <td class="px-3 py-3 align-middle text-sm">
-                <p class="truncate text-ink">{{ user.email }}</p>
+                <p class="truncate text-ink">
+                  {{ user.email }}
+                </p>
               </td>
               <td class="px-3 py-3 align-middle text-sm text-ink">
-                <p class="truncate">{{ user.phone || '—' }}</p>
+                <p class="truncate">
+                  {{ user.phone || '—' }}
+                </p>
               </td>
               <td class="px-3 py-3 align-middle">
                 <StatusBadge :status="user.status" />
               </td>
-              <td class="p-0" aria-hidden="true" />
+              <td
+                class="p-0"
+                aria-hidden="true"
+              />
               <td class="px-3 py-3 align-middle">
-                <div v-if="manageable(user) || removable(user)" class="flex items-center gap-1">
-                  <UTooltip v-if="manageable(user)" text="Edit">
-                    <UButton icon="i-lucide-pencil" color="primary" variant="soft" size="sm" class="rounded-lg transition-colors duration-200 hover:bg-brand-100" aria-label="Edit" @click="openEdit(user)" />
+                <div
+                  v-if="manageable(user) || removable(user)"
+                  class="flex items-center gap-1"
+                >
+                  <UTooltip
+                    v-if="manageable(user)"
+                    text="Edit"
+                  >
+                    <UButton
+                      icon="i-lucide-pencil"
+                      color="primary"
+                      variant="soft"
+                      size="sm"
+                      class="rounded-lg transition-colors duration-200 hover:bg-brand-100"
+                      aria-label="Edit"
+                      @click="openEdit(user)"
+                    />
                   </UTooltip>
-                  <UTooltip v-if="manageable(user) && !isSelf(user)" :text="user.status === 'DISABLED' ? 'Activate' : 'Disable'">
+                  <UTooltip
+                    v-if="manageable(user) && !isSelf(user)"
+                    :text="user.status === 'DISABLED' ? 'Activate' : 'Disable'"
+                  >
                     <UButton
                       :icon="user.status === 'DISABLED' ? 'i-lucide-user-check' : 'i-lucide-user-x'"
                       color="neutral"
@@ -317,7 +390,10 @@ async function setStatus(user: UserRow) {
                       @click="setStatus(user)"
                     />
                   </UTooltip>
-                  <UTooltip v-if="removable(user)" text="Delete">
+                  <UTooltip
+                    v-if="removable(user)"
+                    text="Delete"
+                  >
                     <UButton
                       icon="i-lucide-trash-2"
                       color="error"
@@ -335,55 +411,126 @@ async function setStatus(user: UserRow) {
         </table>
       </div>
       <div class="px-4 pb-4">
-        <ListPagination v-if="data?.meta" v-model:page="query.page" :total="data.meta.total" :page-size="data.meta.pageSize" />
+        <ListPagination
+          v-if="data?.meta"
+          v-model:page="query.page"
+          :total="data.meta.total"
+          :page-size="data.meta.pageSize"
+        />
       </div>
     </div>
-    <UModal v-model:open="confirmOpen" title="Delete user">
+    <UModal
+      v-model:open="confirmOpen"
+      title="Delete user"
+    >
       <template #body>
         <p class="text-sm text-ink">
           Delete {{ removing?.displayName }}? Their sign-in will stop, and this cannot be undone.
         </p>
       </template>
       <template #footer>
-        <UButton color="neutral" variant="outline" @click="confirmOpen = false">
+        <UButton
+          color="neutral"
+          variant="outline"
+          @click="confirmOpen = false"
+        >
           Cancel
         </UButton>
-        <UButton color="error" :loading="deleting" @click="confirmDelete">
+        <UButton
+          color="error"
+          :loading="deleting"
+          @click="confirmDelete"
+        >
           Delete
         </UButton>
       </template>
     </UModal>
-    <UModal v-model:open="open" :title="editing ? 'Edit user' : 'Add user'">
+    <UModal
+      v-model:open="open"
+      :title="editing ? 'Edit user' : 'Add user'"
+    >
       <template #body>
-        <form id="user-form" class="grid gap-3 sm:grid-cols-2" @submit.prevent="saveUser">
-          <UFormField label="Name" required>
-            <UInput v-model="form.displayName" class="w-full" required />
+        <form
+          id="user-form"
+          class="grid gap-3 sm:grid-cols-2"
+          @submit.prevent="saveUser"
+        >
+          <UFormField
+            label="Name"
+            required
+          >
+            <UInput
+              v-model="form.displayName"
+              class="w-full"
+              required
+            />
           </UFormField>
-          <UFormField label="Username" required>
-            <UInput v-model="form.username" class="w-full" required :disabled="Boolean(editing)" />
+          <UFormField
+            label="Username"
+            required
+          >
+            <UInput
+              v-model="form.username"
+              class="w-full"
+              required
+              :disabled="Boolean(editing)"
+            />
           </UFormField>
-          <UFormField label="Email" required>
-            <UInput v-model="form.email" type="email" class="w-full" required />
+          <UFormField
+            label="Email"
+            required
+          >
+            <UInput
+              v-model="form.email"
+              type="email"
+              class="w-full"
+              required
+            />
           </UFormField>
           <UFormField label="Phone">
-            <UInput v-model="form.phone" class="w-full" />
+            <UInput
+              v-model="form.phone"
+              class="w-full"
+            />
           </UFormField>
           <UFormField label="Role">
-            <USelect :key="`role-${editing?.id ?? 'new'}`" v-model="form.role" :items="roleItems" class="w-full" />
+            <USelect
+              :key="`role-${editing?.id ?? 'new'}`"
+              v-model="form.role"
+              :items="roleItems"
+              class="w-full"
+            />
           </UFormField>
           <UFormField label="Status">
-            <USelect :key="`status-${editing?.id ?? 'new'}`" v-model="form.status" :items="statusOptions" class="w-full" />
+            <USelect
+              :key="`status-${editing?.id ?? 'new'}`"
+              v-model="form.status"
+              :items="statusOptions"
+              class="w-full"
+            />
           </UFormField>
-          <p v-if="error" class="text-sm text-danger-600 sm:col-span-2" role="alert">
+          <p
+            v-if="error"
+            class="text-sm text-danger-600 sm:col-span-2"
+            role="alert"
+          >
             {{ error }}
           </p>
         </form>
       </template>
       <template #footer>
-        <UButton color="neutral" variant="outline" @click="open = false">
+        <UButton
+          color="neutral"
+          variant="outline"
+          @click="open = false"
+        >
           Cancel
         </UButton>
-        <UButton type="submit" form="user-form" :loading="saving">
+        <UButton
+          type="submit"
+          form="user-form"
+          :loading="saving"
+        >
           Save
         </UButton>
       </template>

@@ -73,7 +73,11 @@ async function submitSearch() {
       class="sticky top-0 hidden h-svh shrink-0 border-r border-brand-800 bg-[#0f1c1c] transition-[width] duration-200 motion-reduce:transition-none lg:block"
       :class="collapsed ? 'w-[4.5rem]' : 'w-64'"
     >
-      <AdminNav :groups="groups" :collapsed="collapsed" :current="isCurrent" />
+      <AdminNav
+        :groups="groups"
+        :collapsed="collapsed"
+        :current="isCurrent"
+      />
     </aside>
     <USlideover
       v-model:open="menuOpen"
@@ -84,7 +88,11 @@ async function submitSearch() {
       :ui="{ content: 'bg-[#0f1c1c]', header: 'border-white/10', title: 'text-white', description: 'text-brand-200', body: 'bg-[#0f1c1c]' }"
     >
       <template #body>
-        <AdminNav :groups="groups" :current="isCurrent" @navigate="menuOpen = false" />
+        <AdminNav
+          :groups="groups"
+          :current="isCurrent"
+          @navigate="menuOpen = false"
+        />
       </template>
     </USlideover>
     <div class="flex min-w-0 flex-1 flex-col">
@@ -109,9 +117,19 @@ async function submitSearch() {
             @click="collapsed = !collapsed"
           />
         </UTooltip>
-        <nav aria-label="Breadcrumb" class="hidden min-w-0 items-center gap-1 text-sm sm:flex">
-          <template v-for="(crumb, index) in crumbs" :key="crumb.to">
-            <span v-if="index" class="text-ink-muted" aria-hidden="true">/</span>
+        <nav
+          aria-label="Breadcrumb"
+          class="hidden min-w-0 items-center gap-1 text-sm sm:flex"
+        >
+          <template
+            v-for="(crumb, index) in crumbs"
+            :key="crumb.to"
+          >
+            <span
+              v-if="index"
+              class="text-ink-muted"
+              aria-hidden="true"
+            >/</span>
             <NuxtLink
               :to="crumb.to"
               class="truncate text-ink-muted hover:text-ink"
@@ -121,7 +139,11 @@ async function submitSearch() {
             </NuxtLink>
           </template>
         </nav>
-        <form v-if="permissions.includes('customer.read')" class="ml-auto hidden w-56 md:block" @submit.prevent="submitSearch">
+        <form
+          v-if="permissions.includes('customer.read')"
+          class="ml-auto hidden w-56 md:block"
+          @submit.prevent="submitSearch"
+        >
           <UInput
             v-model="search"
             icon="i-lucide-search"
@@ -144,12 +166,19 @@ async function submitSearch() {
             />
           </UTooltip>
           <UDropdownMenu :items="accountItems">
-            <UButton color="neutral" variant="ghost" class="max-w-52">
+            <UButton
+              color="neutral"
+              variant="ghost"
+              class="max-w-52"
+            >
               <span class="grid size-7 place-items-center rounded-full bg-brand-700 text-xs text-white">
                 {{ displayName.slice(0, 1) }}
               </span>
               <span class="hidden truncate text-sm font-medium text-ink sm:block">{{ displayName }}</span>
-              <UIcon name="i-lucide-chevron-down" class="size-4 text-ink-muted" />
+              <UIcon
+                name="i-lucide-chevron-down"
+                class="size-4 text-ink-muted"
+              />
             </UButton>
           </UDropdownMenu>
         </div>
