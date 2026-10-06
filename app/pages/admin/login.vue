@@ -43,17 +43,43 @@ function messageFrom(caught: unknown) {
     <h1 class="mt-6 text-center font-display text-4xl text-ink">
       Staff sign in
     </h1>
-    <form class="mt-6 space-y-4" @submit.prevent="submit">
-      <UFormField label="Username" required>
-        <UInput v-model="username" autocomplete="username" class="w-full" />
+    <form
+      class="mt-6 space-y-4"
+      @submit.prevent="submit"
+    >
+      <UFormField
+        label="Username"
+        required
+      >
+        <UInput
+          v-model="username"
+          autocomplete="username"
+          class="w-full"
+        />
       </UFormField>
-      <UFormField label="Password" required>
-        <UInput v-model="password" type="password" autocomplete="current-password" class="w-full" />
+      <UFormField
+        label="Password"
+        required
+      >
+        <UInput
+          v-model="password"
+          type="password"
+          autocomplete="current-password"
+          class="w-full"
+        />
       </UFormField>
-      <p v-if="error" class="text-sm text-red-700" role="alert">
+      <p
+        v-if="error"
+        class="text-sm text-red-700"
+        role="alert"
+      >
         {{ error }}
       </p>
-      <UButton type="submit" block :loading="pending">
+      <UButton
+        type="submit"
+        block
+        :loading="pending"
+      >
         Sign in
       </UButton>
     </form>

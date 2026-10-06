@@ -1,11 +1,11 @@
-export type SegmentName =
-  | 'New'
-  | 'Returning'
-  | 'VIP'
-  | 'High Value'
-  | 'Inactive'
-  | 'Birthday Upcoming'
-  | 'Frequent Buyer'
+export type SegmentName
+  = | 'New'
+    | 'Returning'
+    | 'VIP'
+    | 'High Value'
+    | 'Inactive'
+    | 'Birthday Upcoming'
+    | 'Frequent Buyer'
 
 export type SegmentThresholds = {
   vipSpend: number

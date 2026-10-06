@@ -84,7 +84,7 @@ export function assertOrigin(event: Parameters<typeof getHeader>[0]) {
   if (!host) {
     throw createError({ statusCode: 403, statusMessage: 'Request blocked.' })
   }
-  let originHost = ''
+  let originHost: string
   try {
     originHost = new URL(origin).host
   } catch {

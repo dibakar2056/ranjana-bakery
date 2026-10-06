@@ -12,7 +12,11 @@ const color = computed(() => {
 </script>
 
 <template>
-  <UBadge :color="color" variant="subtle" class="rounded-md">
+  <UBadge
+    :color="color"
+    variant="subtle"
+    class="rounded-md"
+  >
     {{ status }}
   </UBadge>
 </template>

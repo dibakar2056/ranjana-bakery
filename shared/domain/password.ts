@@ -52,12 +52,12 @@ export function validatePassword(
   return errors
 }
 
-export type LoginDecision =
-  | { result: 'ok' }
-  | { result: 'invalid', failedLoginCount: number, lockedUntil: Date | null }
-  | { result: 'locked' }
-  | { result: 'disabled' }
-  | { result: 'activation_required' }
+export type LoginDecision
+  = | { result: 'ok' }
+    | { result: 'invalid', failedLoginCount: number, lockedUntil: Date | null }
+    | { result: 'locked' }
+    | { result: 'disabled' }
+    | { result: 'activation_required' }
 
 export function evaluateLogin(input: {
   passwordOk: boolean

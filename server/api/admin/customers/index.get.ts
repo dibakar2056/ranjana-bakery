@@ -6,12 +6,12 @@ export default defineEventHandler(async (event) => {
       deletedAt: null,
       ...(query.search
         ? {
-          OR: [
-            { name: { contains: query.search, mode: 'insensitive' as const } },
-            { email: { contains: query.search, mode: 'insensitive' as const } },
-            { phone: { contains: query.search, mode: 'insensitive' as const } }
-          ]
-        }
+            OR: [
+              { name: { contains: query.search, mode: 'insensitive' as const } },
+              { email: { contains: query.search, mode: 'insensitive' as const } },
+              { phone: { contains: query.search, mode: 'insensitive' as const } }
+            ]
+          }
         : {}),
       ...(query.status ? { status: query.status } : {})
     }

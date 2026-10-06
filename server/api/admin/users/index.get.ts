@@ -6,12 +6,12 @@ export default defineEventHandler(async (event) => {
       deletedAt: null,
       ...(query.search
         ? {
-          OR: [
-            { username: { contains: query.search, mode: 'insensitive' as const } },
-            { email: { contains: query.search, mode: 'insensitive' as const } },
-            { displayName: { contains: query.search, mode: 'insensitive' as const } }
-          ]
-        }
+            OR: [
+              { username: { contains: query.search, mode: 'insensitive' as const } },
+              { email: { contains: query.search, mode: 'insensitive' as const } },
+              { displayName: { contains: query.search, mode: 'insensitive' as const } }
+            ]
+          }
         : {})
     }
     const [rows, total] = await Promise.all([
