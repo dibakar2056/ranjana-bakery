@@ -1,0 +1,45 @@
+{
+  "name": "ranjana-bakery",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "preview": "nuxt preview",
+    "postinstall": "prisma generate && nuxt prepare",
+    "lint": "eslint .",
+    "typecheck": "nuxt typecheck",
+    "test": "vitest run",
+    "db:seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1146.0",
+    "@iconify-json/lucide": "^1.2.139",
+    "@iconify-json/simple-icons": "^1.2.98",
+    "@node-rs/argon2": "^2.2.1",
+    "@nuxt/ui": "^4.11.3",
+    "@prisma/client": "^6.19.3",
+    "@sentry/node": "^11.4.0",
+    "ioredis": "^6.0.0",
+    "nodemailer": "^10.0.14",
+    "nuxt": "^4.5.2",
+    "tailwindcss": "^4.3.3",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@nuxt/eslint": "^1.17.0",
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^26.6.4",
+    "eslint": "^10.12.0",
+    "eslint-plugin-better-tailwindcss": "^4.7.0",
+    "prisma": "^6.19.3",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.3",
+    "vue-tsc": "^3.3.12"
+  },
+  "packageManager": "pnpm@12.9.1",
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  }
+}

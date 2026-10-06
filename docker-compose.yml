@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ranjana
+      POSTGRES_PASSWORD: ranjana
+      POSTGRES_DB: ranjana
+    ports:
+      - "5432:5432"
+    volumes:
+      - bakery-postgres:/var/lib/postgresql/data
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+volumes:
+  bakery-postgres:
