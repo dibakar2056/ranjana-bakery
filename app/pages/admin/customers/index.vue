@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import type { TableColumn } from '@nuxt/ui'
+
 definePageMeta({ middleware: ['staff'], layout: 'admin' })
 
 const route = useRoute()
-const query = reactive({ page: 1, search: typeof route.query.search === 'string' ? route.query.search : '' })
+const query = reactive({ page: 1, pageSize: 5, search: typeof route.query.search === 'string' ? route.query.search : '' })
 watch(() => route.query.search, (value) => {
   query.search = typeof value === 'string' ? value : ''
 })
@@ -25,6 +27,15 @@ function notify(title: string, color: 'success' | 'error' = 'success') {
 }
 const canCreate = computed(() => me.value?.data?.permissions.includes('customer.create') ?? false)
 const canUpdate = computed(() => me.value?.data?.permissions.includes('customer.update') ?? false)
+const columns: TableColumn<CustomerRow>[] = [
+  { id: 'sn', header: 'SN' },
+  { id: 'customer', header: 'Customer' },
+  { accessorKey: 'phone', header: 'Phone' },
+  { accessorKey: 'email', header: 'Email' },
+  { accessorKey: 'orders', header: 'Orders' },
+  { accessorKey: 'status', header: 'Status' },
+  { id: 'actions', header: 'Actions' }
+]
 
 function resetForm() {
   form.name = ''
@@ -86,8 +97,7 @@ async function saveCustomer() {
 }
 
 function serial(index: number) {
-  const size = data.value?.meta.pageSize ?? 20
-  return (query.page - 1) * size + index + 1
+  return (query.page - 1) * query.pageSize + index + 1
 }
 
 async function setStatus(customer: CustomerRow) {
@@ -113,8 +123,6 @@ async function setStatus(customer: CustomerRow) {
         icon="i-lucide-search"
         placeholder="Search customers"
         aria-label="Search customers"
-        color="neutral"
-        variant="outline"
         class="w-full sm:w-64"
       />
       <UButton
@@ -125,38 +133,46 @@ async function setStatus(customer: CustomerRow) {
         Add
       </UButton>
     </PageHeader>
-    <LoadingSkeleton v-if="pending" />
-    <div v-else-if="data?.data?.length">
-      <div class="mb-2 hidden grid-cols-[3rem_1fr] px-4 text-xs font-medium tracking-wide text-ink-muted uppercase sm:grid">
-        <span>SN</span>
-        <span>Customer</span>
-      </div>
-      <ul class="space-y-2">
-        <li
-          v-for="(customer, index) in data.data"
-          :key="customer.id"
-          class="flex items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-3 shadow-card"
-        >
-          <span class="w-8 shrink-0 text-sm text-ink-muted">{{ serial(index) }}</span>
-          <span class="grid size-10 shrink-0 place-items-center rounded-full bg-brand-50 text-sm font-medium text-brand-700">
-            {{ customer.name.slice(0, 1) }}
-          </span>
-          <span class="min-w-0 flex-1">
-            <span class="block truncate font-medium text-ink">{{ customer.name }}</span>
-            <span class="block truncate text-sm text-ink-muted">
-              {{ customer.phone || 'No phone' }} · {{ customer.email || 'No email' }} · {{ customer.orders }} orders
+    <LoadingSkeleton v-if="pending && !data" />
+    <div
+      v-else-if="data?.data?.length"
+      class="overflow-hidden rounded-2xl border border-line bg-surface shadow-card"
+    >
+      <UTable
+        :data="data.data"
+        :columns="columns"
+        :loading="pending"
+        class="flex-1"
+      >
+        <template #sn-cell="{ row }">
+          {{ serial(row.index) }}
+        </template>
+        <template #customer-cell="{ row }">
+          <div class="flex min-w-0 items-center gap-3">
+            <span class="grid size-10 shrink-0 place-items-center rounded-full bg-brand-50 text-sm font-medium text-brand-700">
+              {{ row.original.name.slice(0, 1) }}
             </span>
-          </span>
-          <StatusBadge :status="customer.status" />
-          <div class="flex shrink-0 items-center gap-1">
+            <span class="truncate font-medium text-ink">{{ row.original.name }}</span>
+          </div>
+        </template>
+        <template #phone-cell="{ row }">
+          {{ row.original.phone || '—' }}
+        </template>
+        <template #email-cell="{ row }">
+          {{ row.original.email || '—' }}
+        </template>
+        <template #status-cell="{ row }">
+          <StatusBadge :status="row.original.status" />
+        </template>
+        <template #actions-cell="{ row }">
+          <div class="flex items-center gap-1">
             <UTooltip text="View">
               <UButton
-                :to="`/admin/customers/${customer.id}`"
+                :to="`/admin/customers/${row.original.id}`"
                 icon="i-lucide-eye"
                 color="neutral"
                 variant="soft"
                 size="sm"
-                class="rounded-lg"
                 aria-label="View"
               />
             </UTooltip>
@@ -169,33 +185,31 @@ async function setStatus(customer: CustomerRow) {
                 color="primary"
                 variant="soft"
                 size="sm"
-                class="rounded-lg transition-colors duration-200 hover:bg-brand-100"
                 aria-label="Edit"
-                @click="openEdit(customer)"
+                @click="openEdit(row.original)"
               />
             </UTooltip>
             <UTooltip
               v-if="canUpdate"
-              :text="customer.status === 'INACTIVE' ? 'Activate' : 'Deactivate'"
+              :text="row.original.status === 'INACTIVE' ? 'Activate' : 'Deactivate'"
             >
               <UButton
-                :icon="customer.status === 'INACTIVE' ? 'i-lucide-user-check' : 'i-lucide-user-x'"
+                :icon="row.original.status === 'INACTIVE' ? 'i-lucide-user-check' : 'i-lucide-user-x'"
                 color="neutral"
                 variant="soft"
                 size="sm"
-                class="rounded-lg"
-                :aria-label="customer.status === 'INACTIVE' ? 'Activate' : 'Deactivate'"
-                @click="setStatus(customer)"
+                :aria-label="row.original.status === 'INACTIVE' ? 'Activate' : 'Deactivate'"
+                @click="setStatus(row.original)"
               />
             </UTooltip>
           </div>
-        </li>
-      </ul>
-      <ListPagination
+        </template>
+      </UTable>
+      <TablePager
         v-if="data.meta"
         v-model:page="query.page"
+        v-model:rows="query.pageSize"
         :total="data.meta.total"
-        :page-size="data.meta.pageSize"
       />
     </div>
     <EmptyState
@@ -206,76 +220,57 @@ async function setStatus(customer: CustomerRow) {
       :action="canCreate ? 'Add' : undefined"
       @action="openAdd"
     />
-    <UModal
+    <FormModal
       v-model:open="open"
+      wide
+      form-id="customer-form"
       :title="editing ? 'Edit customer' : 'Add customer'"
+      :saving="saving"
+      @submit="saveCustomer"
     >
-      <template #body>
-        <form
-          id="customer-form"
-          class="grid gap-3"
-          @submit.prevent="saveCustomer"
-        >
-          <UFormField
-            label="Name"
-            required
-          >
-            <UInput
-              v-model="form.name"
-              class="w-full"
-              required
-            />
-          </UFormField>
-          <UFormField label="Phone">
-            <UInput
-              v-model="form.phone"
-              class="w-full"
-            />
-          </UFormField>
-          <UFormField
-            v-if="!editing"
-            label="Email"
-          >
-            <UInput
-              v-model="form.email"
-              type="email"
-              class="w-full"
-            />
-          </UFormField>
-          <UFormField
-            v-if="!editing"
-            label="Address"
-          >
-            <UInput
-              v-model="form.line1"
-              class="w-full"
-            />
-          </UFormField>
-          <p
-            v-if="error"
-            class="text-sm text-danger-600"
-            role="alert"
-          >
-            {{ error }}
-          </p>
-        </form>
-      </template>
-      <template #footer>
-        <UButton
-          color="neutral"
-          variant="outline"
-          @click="open = false"
-        >
-          Cancel
-        </UButton>
-        <UButton
-          type="submit"
-          form="customer-form"
-          :loading="saving"
-        >
-          Save
-        </UButton>
-      </template>
-    </UModal>
+      <UFormField
+        label="Name"
+        required
+      >
+        <UInput
+          v-model="form.name"
+          class="w-full"
+          required
+        />
+      </UFormField>
+      <UFormField label="Phone">
+        <UInput
+          v-model="form.phone"
+          class="w-full"
+        />
+      </UFormField>
+      <UFormField
+        v-if="!editing"
+        label="Email"
+      >
+        <UInput
+          v-model="form.email"
+          type="email"
+          class="w-full"
+        />
+      </UFormField>
+      <UFormField
+        v-if="!editing"
+        label="Address"
+        class="sm:col-span-2"
+      >
+        <UInput
+          v-model="form.line1"
+          class="w-full"
+        />
+      </UFormField>
+      <p
+        v-if="error"
+        class="text-sm text-danger-600 sm:col-span-2"
+        role="alert"
+      >
+        {{ error }}
+      </p>
+    </FormModal>
   </section>
 </template>
