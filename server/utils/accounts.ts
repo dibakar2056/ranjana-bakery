@@ -13,6 +13,7 @@ export function presentUser(user: {
   passwordChangeRequired: boolean
   lastLoginAt: Date | null
   createdAt: Date
+  imageUrl?: string | null
   roles: Array<{ role: { key: string } }>
 }) {
   return {
@@ -21,6 +22,7 @@ export function presentUser(user: {
     email: user.email,
     displayName: user.displayName,
     phone: user.phone,
+    image: user.imageUrl ?? null,
     status: user.status,
     userVersion: user.userVersion,
     passwordChangeRequired: user.passwordChangeRequired,

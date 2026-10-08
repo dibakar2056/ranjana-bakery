@@ -23,11 +23,13 @@ export default defineEventHandler(async (event) => {
     const targetRoles = target.roles.map(item => item.role.key) as RoleKey[]
     assertCanManage(actor.roles, targetRoles)
     const body = await readValid(event, schema)
-    if (body.role) assertCanAssign(actor.roles, body.role)
-    if (body.status === 'DISABLED' && target.id === actor.id) {
+    const roleChanged = Boolean(body.role && body.role !== targetRoles[0])
+    const statusChanged = body.status !== undefined && body.status !== target.status
+    if (roleChanged && body.role) assertCanAssign(actor.roles, body.role)
+    if (statusChanged && body.status === 'DISABLED' && target.id === actor.id) {
       throw createError({ statusCode: 422, statusMessage: 'You cannot disable your own account.' })
     }
-    if (body.role) {
+    if (roleChanged && body.role) {
       const role = await prisma.role.findUniqueOrThrow({ where: { key: body.role } })
       await prisma.userRole.deleteMany({ where: { userId: target.id } })
       await prisma.userRole.create({ data: { userId: target.id, roleId: role.id } })
@@ -39,15 +41,15 @@ export default defineEventHandler(async (event) => {
         username: body.username,
         email: body.email?.toLowerCase(),
         phone: body.phone === undefined ? undefined : body.phone,
-        status: body.status,
-        userVersion: body.role || body.status ? { increment: 1 } : undefined
+        status: statusChanged ? body.status : undefined,
+        userVersion: roleChanged || statusChanged ? { increment: 1 } : undefined
       },
       include: { roles: { include: { role: true } } }
     })
-    if (body.role || body.status) await revokeUserSessions(target.id)
+    if (roleChanged || statusChanged) await revokeUserSessions(target.id)
     await writeAudit(event, {
       actorId: actor.id,
-      action: body.status === 'DISABLED' ? 'USER_DISABLED' : body.role ? 'ROLE_CHANGED' : 'USER_UPDATED',
+      action: statusChanged && body.status === 'DISABLED' ? 'USER_DISABLED' : roleChanged ? 'ROLE_CHANGED' : 'USER_UPDATED',
       entity: 'user',
       entityId: target.id,
       before: { status: target.status, roles: targetRoles },

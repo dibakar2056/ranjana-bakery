@@ -89,21 +89,22 @@ async function addNote() {
         />
       </div>
       <div
-        class="mt-4 flex gap-2 border-b border-line"
+        class="mt-4 flex gap-2"
         role="tablist"
       >
-        <button
+        <UButton
           v-for="item in (['overview', 'orders', 'notes'] as const)"
           :key="item"
           type="button"
           role="tab"
-          class="border-b-2 px-3 py-2 text-sm capitalize"
-          :class="tab === item ? 'border-brand-600 font-medium text-ink' : 'border-transparent text-ink-muted'"
+          :color="tab === item ? 'primary' : 'neutral'"
+          :variant="tab === item ? 'solid' : 'ghost'"
+          class="capitalize"
           :aria-selected="tab === item"
           @click="tab = item"
         >
           {{ item }}
-        </button>
+        </UButton>
       </div>
       <div
         v-if="tab === 'overview'"
