@@ -1,0 +1,32 @@
+name: migrate
+
+on:
+  push:
+    branches: [dev, master]
+    paths:
+      - prisma/migrations/**
+      - .github/workflows/migrate.yml
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Install node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Apply migrations
+        run: pnpm exec prisma migrate deploy
