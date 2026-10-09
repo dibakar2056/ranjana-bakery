@@ -115,8 +115,8 @@ async function resetPassword() {
           height="128"
           class="mx-auto mb-6 size-32 rounded-2xl object-cover"
         >
-        <h1 class="text-4xl font-semibold tracking-tight text-ink">
-          {{ mode === 'sign-in' ? 'Admin sign in' : 'Reset password' }}
+        <h1 class="text-center text-4xl font-semibold tracking-tight text-ink">
+          {{ mode === 'sign-in' ? 'Staff sign in' : 'Reset password' }}
         </h1>
         <p
           v-if="notice && mode === 'sign-in'"
