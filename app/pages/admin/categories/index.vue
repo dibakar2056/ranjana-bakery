@@ -13,7 +13,7 @@ type CategoryRow = {
   products: number
 }
 
-const query = reactive({ page: 1, pageSize: 5, search: '' })
+const query = reactive({ page: 1, pageSize: 10, search: '' })
 const { data: me } = await useFetch<{ data: { permissions: string[] } | null }>('/api/auth/me')
 const { data, refresh, pending } = await useFetch<{ data: CategoryRow[], meta: { total: number, pageSize: number } }>('/api/admin/categories', { query })
 watch(() => query.search, () => {

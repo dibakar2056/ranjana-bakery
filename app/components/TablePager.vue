@@ -7,9 +7,10 @@ const props = defineProps<{
 }>()
 
 const options = [
-  { label: '5', value: '5' },
   { label: '10', value: '10' },
-  { label: '20', value: '20' }
+  { label: '20', value: '20' },
+  { label: '50', value: '50' },
+  { label: '100', value: '100' }
 ]
 const pageSize = computed({
   get: () => String(rows.value),
@@ -32,7 +33,7 @@ const to = computed(() => Math.min(props.total, page.value * rows.value))
         v-model="pageSize"
         :items="options"
         aria-label="Rows per page"
-        class="w-20"
+        class="w-24"
       />
       <UPagination
         :page="page"

@@ -20,11 +20,13 @@ const { data, refresh, pending, error } = await useFetch<{ data: {
     lastOrder: string | null
   }
   notes: Array<{ id: string, body: string, author: string, createdAt: string }>
+  addresses: Array<{ id: string, line1: string, city: string, isDefault: boolean }>
   recentOrders: Array<{ id: string, orderNumber: string, status: string, total: number, createdAt: string }>
 } }>(() => `/api/admin/customers/${id.value}`)
 const note = ref('')
 const tab = ref<'overview' | 'orders' | 'notes'>('overview')
 const customer = computed(() => data.value?.data)
+const address = computed(() => customer.value?.addresses.find(item => item.isDefault) ?? customer.value?.addresses[0] ?? null)
 
 async function addNote() {
   if (!note.value.trim()) return
@@ -54,6 +56,12 @@ async function addNote() {
             </h1>
             <p class="mt-1 text-sm text-ink-muted">
               {{ customer.email || 'No email' }} · {{ customer.phone || 'No phone' }}
+            </p>
+            <p
+              v-if="address"
+              class="mt-1 text-sm text-ink-muted"
+            >
+              {{ address.line1 }}, {{ address.city }}
             </p>
             <div class="mt-3 flex flex-wrap gap-2">
               <StatusBadge :status="customer.status" />
@@ -153,7 +161,12 @@ async function addNote() {
             :key="order.id"
             class="flex items-center justify-between gap-3"
           >
-            <span>{{ order.orderNumber }} · {{ order.total }}</span>
+            <NuxtLink
+              :to="`/admin/orders/${order.id}`"
+              class="font-medium text-brand-700"
+            >
+              {{ order.orderNumber }} · {{ order.total }}
+            </NuxtLink>
             <StatusBadge :status="order.status" />
           </li>
         </ul>

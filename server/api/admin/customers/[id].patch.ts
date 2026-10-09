@@ -6,7 +6,11 @@ const schema = z.object({
   preferences: z.string().max(500).nullable().optional(),
   marketingConsent: z.boolean().optional(),
   status: z.enum(['ACTIVE', 'INACTIVE']).optional(),
-  note: z.string().trim().min(1).max(1000).optional()
+  note: z.string().trim().min(1).max(1000).optional(),
+  address: z.object({
+    line1: z.string().trim().min(3).max(160),
+    city: z.string().trim().min(2).max(80)
+  }).optional()
 })
 
 export default defineEventHandler(async (event) => {
@@ -15,6 +19,9 @@ export default defineEventHandler(async (event) => {
     const id = getRouterParam(event, 'id')
     if (!id) throw createError({ statusCode: 404, statusMessage: 'Customer not found.' })
     const body = await readValid(event, schema)
+    const current = body.address
+      ? await prisma.customerAddress.findFirst({ where: { customerId: id }, orderBy: { isDefault: 'desc' } })
+      : null
     await prisma.customer.update({
       where: { id },
       data: {
@@ -23,7 +30,12 @@ export default defineEventHandler(async (event) => {
         preferences: body.preferences === undefined ? undefined : body.preferences,
         marketingConsent: body.marketingConsent,
         status: body.status,
-        notes: body.note ? { create: { body: body.note, authorId: actor.id } } : undefined
+        notes: body.note ? { create: { body: body.note, authorId: actor.id } } : undefined,
+        addresses: body.address
+          ? current
+            ? { update: { where: { id: current.id }, data: { line1: body.address.line1, city: body.address.city, isDefault: true } } }
+            : { create: { line1: body.address.line1, city: body.address.city, isDefault: true } }
+          : undefined
       }
     })
     await writeAudit(event, {
