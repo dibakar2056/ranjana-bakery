@@ -1,15 +1,15 @@
 <script setup lang="ts">
 definePageMeta({ middleware: ['staff'], layout: 'admin' })
 
-const route = useRoute()
-const id = computed(() => String(route.params.id))
-const { data, refresh, pending, error } = await useFetch<{ data: {
+type CustomerDetail = {
   name: string
   email: string | null
   phone: string | null
   status: string
+  birthday: string | null
   preferences: string | null
   marketingConsent: boolean
+  createdAt: string
   segments: string[]
   analytics: {
     totalOrders: number
@@ -20,13 +20,28 @@ const { data, refresh, pending, error } = await useFetch<{ data: {
     lastOrder: string | null
   }
   notes: Array<{ id: string, body: string, author: string, createdAt: string }>
-  addresses: Array<{ id: string, line1: string, city: string, isDefault: boolean }>
+  addresses: Array<{ id: string, line1: string, line2: string | null, city: string, isDefault: boolean }>
   recentOrders: Array<{ id: string, orderNumber: string, status: string, total: number, createdAt: string }>
-} }>(() => `/api/admin/customers/${id.value}`)
+}
+
+const route = useRoute()
+const id = computed(() => String(route.params.id))
+const { data, refresh, pending, error } = await useFetch<{ data: CustomerDetail }>(() => `/api/admin/customers/${id.value}`)
 const note = ref('')
-const tab = ref<'overview' | 'orders' | 'notes'>('overview')
 const customer = computed(() => data.value?.data)
-const address = computed(() => customer.value?.addresses.find(item => item.isDefault) ?? customer.value?.addresses[0] ?? null)
+
+function blank(value: string | null | undefined) {
+  return value?.trim() ? value : 'n/a'
+}
+
+function when(value: string | null) {
+  if (!value) return 'n/a'
+  return new Date(value).toLocaleString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
+function addressLine(item: CustomerDetail['addresses'][number]) {
+  return [item.line1, item.line2, item.city].filter(part => part?.trim()).join(', ')
+}
 
 async function addNote() {
   if (!note.value.trim()) return
@@ -45,37 +60,117 @@ async function addNote() {
       @retry="refresh()"
     />
     <template v-else-if="customer">
-      <div class="rounded-2xl border border-line bg-surface p-5 shadow-card">
-        <div class="flex flex-wrap items-start gap-4">
-          <span class="grid size-12 place-items-center rounded-full bg-brand-50 text-lg font-medium text-brand-700">
-            {{ customer.name.slice(0, 1) }}
-          </span>
-          <div class="min-w-0 flex-1">
-            <h1 class="text-[28px] leading-tight font-semibold tracking-tight">
-              {{ customer.name }}
-            </h1>
-            <p class="mt-1 text-sm text-ink-muted">
-              {{ customer.email || 'No email' }} · {{ customer.phone || 'No phone' }}
-            </p>
-            <p
-              v-if="address"
-              class="mt-1 text-sm text-ink-muted"
-            >
-              {{ address.line1 }}, {{ address.city }}
-            </p>
-            <div class="mt-3 flex flex-wrap gap-2">
-              <StatusBadge :status="customer.status" />
-              <UBadge
-                v-for="segment in customer.segments"
-                :key="segment"
-                color="neutral"
-                variant="subtle"
+      <PageHeader :title="customer.name">
+        <UButton
+          to="/admin/customers"
+          color="neutral"
+          variant="soft"
+          icon="i-lucide-arrow-left"
+        >
+          Customers
+        </UButton>
+      </PageHeader>
+      <div class="mb-4 flex flex-wrap items-center gap-2">
+        <StatusBadge :status="customer.status" />
+        <UBadge
+          v-for="segment in customer.segments"
+          :key="segment"
+          color="neutral"
+          variant="subtle"
+        >
+          {{ segment }}
+        </UBadge>
+      </div>
+      <div class="grid gap-4 md:grid-cols-2">
+        <article class="h-full rounded-2xl border border-line bg-surface p-5 shadow-card">
+          <h2 class="text-base font-medium">
+            Contact
+          </h2>
+          <dl class="mt-4 grid grid-cols-[8.5rem_minmax(0,1fr)] gap-x-3 gap-y-2 text-sm">
+            <dt class="text-ink-muted">
+              Phone
+            </dt>
+            <dd class="text-right break-words">
+              {{ blank(customer.phone) }}
+            </dd>
+            <dt class="text-ink-muted">
+              Email
+            </dt>
+            <dd class="text-right break-words">
+              {{ blank(customer.email) }}
+            </dd>
+            <template v-if="customer.addresses.length">
+              <template
+                v-for="item in customer.addresses"
+                :key="item.id"
               >
-                {{ segment }}
-              </UBadge>
-            </div>
-          </div>
-        </div>
+                <dt class="text-ink-muted">
+                  Address
+                </dt>
+                <dd class="text-right break-words">
+                  {{ addressLine(item) }}
+                </dd>
+              </template>
+            </template>
+            <template v-else>
+              <dt class="text-ink-muted">
+                Address
+              </dt>
+              <dd class="text-right">
+                n/a
+              </dd>
+            </template>
+            <dt class="text-ink-muted">
+              Birthday
+            </dt>
+            <dd class="text-right">
+              {{ when(customer.birthday) }}
+            </dd>
+            <dt class="text-ink-muted">
+              Preferences
+            </dt>
+            <dd class="text-right break-words">
+              {{ blank(customer.preferences) }}
+            </dd>
+          </dl>
+        </article>
+        <article class="h-full rounded-2xl border border-line bg-surface p-5 shadow-card">
+          <h2 class="text-base font-medium">
+            Account
+          </h2>
+          <dl class="mt-4 grid grid-cols-[8.5rem_minmax(0,1fr)] gap-x-3 gap-y-2 text-sm">
+            <dt class="text-ink-muted">
+              Status
+            </dt>
+            <dd class="text-right">
+              {{ customer.status === 'ACTIVE' ? 'Active' : 'Inactive' }}
+            </dd>
+            <dt class="text-ink-muted">
+              Marketing
+            </dt>
+            <dd class="text-right">
+              {{ customer.marketingConsent ? 'Yes' : 'No' }}
+            </dd>
+            <dt class="text-ink-muted">
+              Customer since
+            </dt>
+            <dd class="text-right">
+              {{ when(customer.createdAt) }}
+            </dd>
+            <dt class="text-ink-muted">
+              Loyalty
+            </dt>
+            <dd class="text-right">
+              {{ customer.analytics.loyaltyPoints }} points
+            </dd>
+            <dt class="text-ink-muted">
+              Last order
+            </dt>
+            <dd class="text-right">
+              {{ when(customer.analytics.lastOrder) }}
+            </dd>
+          </dl>
+        </article>
       </div>
       <div class="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
@@ -96,28 +191,7 @@ async function addNote() {
           hint="points"
         />
       </div>
-      <div
-        class="mt-4 flex gap-2"
-        role="tablist"
-      >
-        <UButton
-          v-for="item in (['overview', 'orders', 'notes'] as const)"
-          :key="item"
-          type="button"
-          role="tab"
-          :color="tab === item ? 'primary' : 'neutral'"
-          :variant="tab === item ? 'solid' : 'ghost'"
-          class="capitalize"
-          :aria-selected="tab === item"
-          @click="tab = item"
-        >
-          {{ item }}
-        </UButton>
-      </div>
-      <div
-        v-if="tab === 'overview'"
-        class="mt-4 rounded-2xl border border-line bg-surface p-5 shadow-card"
-      >
+      <div class="mt-4 rounded-2xl border border-line bg-surface p-5 shadow-card">
         <h2 class="text-base font-medium">
           Favorite products
         </h2>
@@ -139,10 +213,7 @@ async function addNote() {
           </li>
         </ul>
       </div>
-      <div
-        v-else-if="tab === 'orders'"
-        class="mt-4 rounded-2xl border border-line bg-surface p-5 shadow-card"
-      >
+      <div class="mt-4 rounded-2xl border border-line bg-surface p-5 shadow-card">
         <h2 class="text-base font-medium">
           Recent orders
         </h2>
@@ -165,16 +236,13 @@ async function addNote() {
               :to="`/admin/orders/${order.id}`"
               class="font-medium text-brand-700"
             >
-              {{ order.orderNumber }} · {{ order.total }}
+              {{ order.orderNumber }} · {{ order.total }} · {{ when(order.createdAt) }}
             </NuxtLink>
             <StatusBadge :status="order.status" />
           </li>
         </ul>
       </div>
-      <div
-        v-else
-        class="mt-4 rounded-2xl border border-line bg-surface p-5 shadow-card"
-      >
+      <div class="mt-4 rounded-2xl border border-line bg-surface p-5 shadow-card">
         <h2 class="text-base font-medium">
           Notes
         </h2>
@@ -199,7 +267,7 @@ async function addNote() {
           >
             <p>{{ item.body }}</p>
             <p class="text-[13px] text-ink-muted">
-              {{ item.author }}
+              {{ item.author }} · {{ when(item.createdAt) }}
             </p>
           </li>
           <li
