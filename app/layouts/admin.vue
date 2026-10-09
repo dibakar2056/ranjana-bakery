@@ -1,9 +1,10 @@
 <script setup lang="ts">
-type Staff = { displayName: string, roles: string[], permissions: string[] }
+type Staff = { displayName: string, image: string | null, roles: string[], permissions: string[] }
 
 const { data } = await useFetch<{ data: Staff | null }>('/api/auth/me')
 const permissions = computed(() => data.value?.data?.permissions ?? [])
 const displayName = computed(() => data.value?.data?.displayName ?? 'Staff')
+const image = computed(() => data.value?.data?.image ?? null)
 const route = useRoute()
 const menuOpen = ref(false)
 const collapsed = ref(false)
@@ -189,7 +190,16 @@ async function submitSearch() {
               variant="ghost"
               class="max-w-52"
             >
-              <span class="grid size-7 place-items-center rounded-full bg-brand-700 text-xs text-white">
+              <img
+                v-if="image"
+                :src="image"
+                alt=""
+                class="size-7 shrink-0 rounded-full object-cover"
+              >
+              <span
+                v-else
+                class="grid size-7 place-items-center rounded-full bg-brand-700 text-xs text-white"
+              >
                 {{ displayName.slice(0, 1) }}
               </span>
               <span class="hidden truncate text-sm font-medium text-ink sm:block">{{ displayName }}</span>
