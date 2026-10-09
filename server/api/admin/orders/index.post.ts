@@ -12,7 +12,7 @@ const schema = z.object({
     })
   }).optional(),
   fulfillment: z.enum(['PICKUP', 'DELIVERY']),
-  scheduledAt: z.string().trim().optional(),
+  scheduledAt: z.string().trim().min(1),
   notes: z.string().trim().max(1000).optional(),
   paymentStatus: z.enum(['PENDING', 'PAID']).optional(),
   advance: z.number().min(0).max(1000000).optional(),
@@ -33,11 +33,8 @@ export default defineEventHandler(async (event) => {
       ? await prisma.customer.findFirst({ where: { id: body.customerId, deletedAt: null, status: 'ACTIVE' } })
       : null
     if (!existing && !body.customer) throw createError({ statusCode: 422, statusMessage: 'Choose a customer.' })
-    let scheduledAt: Date | null = null
-    if (body.scheduledAt) {
-      scheduledAt = new Date(body.scheduledAt)
-      if (Number.isNaN(scheduledAt.getTime())) throw createError({ statusCode: 422, statusMessage: 'Choose a valid time.' })
-    }
+    const scheduledAt = new Date(body.scheduledAt)
+    if (Number.isNaN(scheduledAt.getTime())) throw createError({ statusCode: 422, statusMessage: 'Choose a ready at date.' })
     const quantities = new Map<string, number>()
     for (const item of body.items) quantities.set(item.productId, (quantities.get(item.productId) ?? 0) + item.quantity)
     const products = await prisma.product.findMany({

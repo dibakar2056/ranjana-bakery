@@ -171,6 +171,10 @@ async function save() {
     error.value = 'Choose a product and a quantity.'
     return
   }
+  if (!form.scheduledAt) {
+    error.value = 'Choose a ready at date.'
+    return
+  }
   const advance = form.advance === '' ? 0 : Number(form.advance)
   if (!Number.isFinite(advance) || advance < 0) {
     error.value = 'Enter an advance of zero or more.'
@@ -186,7 +190,7 @@ async function save() {
             ? { customer: { name: form.customerName.trim(), phone: form.customerPhone.trim() || undefined, address: { line1: form.customerStreet.trim(), city: form.customerCity.trim() } } }
             : { customerId: form.customerId }),
           fulfillment: form.fulfillment,
-          scheduledAt: form.scheduledAt ? new Date(form.scheduledAt).toISOString() : undefined,
+          scheduledAt: new Date(form.scheduledAt).toISOString(),
           notes: form.notes || undefined,
           paymentStatus: form.paymentStatus,
           advance,
@@ -396,6 +400,7 @@ async function save() {
       </UFormField>
       <UFormField
         label="Ready at"
+        required
         class="w-60"
       >
         <UPopover v-model:open="dateOpen">
