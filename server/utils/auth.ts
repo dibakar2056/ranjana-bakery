@@ -9,6 +9,7 @@ export type AuthUser = {
   username: string
   email: string
   displayName: string
+  imageUrl: string | null
   status: UserStatus
   userVersion: number
   passwordChangeRequired: boolean
@@ -36,6 +37,7 @@ export function toAuthUser(user: {
   username: string
   email: string
   displayName: string
+  imageUrl: string | null
   status: UserStatus
   userVersion: number
   passwordChangeRequired: boolean
@@ -48,6 +50,7 @@ export function toAuthUser(user: {
     username: user.username,
     email: user.email,
     displayName: user.displayName,
+    imageUrl: user.imageUrl,
     status: user.status,
     userVersion: user.userVersion,
     passwordChangeRequired: user.passwordChangeRequired,
@@ -63,6 +66,7 @@ export function publicUser(user: AuthUser) {
     username: user.username,
     email: user.email,
     displayName: user.displayName,
+    image: user.imageUrl,
     roles: user.roles,
     permissions: user.permissions,
     passwordChangeRequired: user.passwordChangeRequired
