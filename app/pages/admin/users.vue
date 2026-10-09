@@ -16,7 +16,7 @@ type UserRow = {
 }
 
 const { data: me } = await useFetch<{ data: { id: string, permissions: string[], roles: string[] } | null }>('/api/auth/me')
-const query = reactive({ page: 1, pageSize: 5, search: '' })
+const query = reactive({ page: 1, pageSize: 10, search: '' })
 const { data, refresh, pending } = await useFetch<{ data: UserRow[], meta: { total: number, pageSize: number } }>('/api/admin/users', {
   query
 })

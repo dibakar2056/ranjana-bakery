@@ -18,7 +18,11 @@ export default defineEventHandler(async (event) => {
     const [rows, total] = await Promise.all([
       prisma.customer.findMany({
         where,
-        include: { loyalty: true, _count: { select: { orders: true } } },
+        include: {
+          loyalty: true,
+          _count: { select: { orders: true } },
+          addresses: { orderBy: { isDefault: 'desc' }, take: 1 }
+        },
         orderBy: { [query.sort]: query.dir },
         skip: query.skip,
         take: query.pageSize
@@ -33,6 +37,8 @@ export default defineEventHandler(async (event) => {
       status: row.status,
       marketingConsent: row.marketingConsent,
       orders: row._count.orders,
+      addressLine: row.addresses[0]?.line1 ?? null,
+      addressCity: row.addresses[0]?.city ?? null,
       loyaltyPoints: row.loyalty?.balance ?? 0,
       createdAt: row.createdAt
     })), pageMeta(query.page, query.pageSize, total))

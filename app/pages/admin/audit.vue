@@ -11,7 +11,7 @@ type AuditRow = {
   createdAt: string
 }
 
-const query = reactive({ page: 1, pageSize: 5 })
+const query = reactive({ page: 1, pageSize: 10 })
 
 function serial(index: number) {
   return (query.page - 1) * query.pageSize + index + 1

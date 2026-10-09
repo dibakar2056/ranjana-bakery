@@ -153,7 +153,12 @@ function money(amount: number) {
               :key="order.id"
               class="flex items-center justify-between gap-3"
             >
-              <span>{{ order.orderNumber }} · {{ order.customer }}</span>
+              <NuxtLink
+                :to="`/admin/orders/${order.id}`"
+                class="font-medium text-brand-700"
+              >
+                {{ order.orderNumber }} · {{ order.customer }}
+              </NuxtLink>
               <StatusBadge :status="order.status" />
             </li>
           </ul>

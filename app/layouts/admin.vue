@@ -33,6 +33,12 @@ const groups = computed(() => {
       items: [{ label: 'Customers', icon: 'i-lucide-users', to: '/admin/customers' }]
     })
   }
+  if (permissions.value.includes('order.read')) {
+    sections.push({
+      label: 'Orders',
+      items: [{ label: 'Orders', icon: 'i-lucide-shopping-bag', to: '/admin/orders' }]
+    })
+  }
   const catalog = []
   if (permissions.value.includes('category.read')) catalog.push({ label: 'Categories', icon: 'i-lucide-folder', to: '/admin/categories' })
   if (permissions.value.includes('product.read')) catalog.push({ label: 'Products', icon: 'i-lucide-cake', to: '/admin/products' })
@@ -48,6 +54,8 @@ const crumbs = computed(() => {
   const items = [{ label: 'Dashboard', to: '/admin' }]
   if (route.path.startsWith('/admin/categories')) items.push({ label: 'Categories', to: '/admin/categories' })
   if (route.path.startsWith('/admin/products')) items.push({ label: 'Products', to: '/admin/products' })
+  if (route.path.startsWith('/admin/orders')) items.push({ label: 'Orders', to: '/admin/orders' })
+  if (route.path.startsWith('/admin/orders/') && route.params.id) items.push({ label: 'Order', to: route.path })
   if (route.path.startsWith('/admin/customers')) items.push({ label: 'Customers', to: '/admin/customers' })
   if (route.path.startsWith('/admin/customers/') && route.params.id) items.push({ label: 'Profile', to: route.path })
   if (route.path.startsWith('/admin/users')) items.push({ label: 'Users', to: '/admin/users' })

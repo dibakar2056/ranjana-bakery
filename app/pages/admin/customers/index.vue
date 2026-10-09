@@ -4,11 +4,11 @@ import type { TableColumn } from '@nuxt/ui'
 definePageMeta({ middleware: ['staff'], layout: 'admin' })
 
 const route = useRoute()
-const query = reactive({ page: 1, pageSize: 5, search: typeof route.query.search === 'string' ? route.query.search : '' })
+const query = reactive({ page: 1, pageSize: 10, search: typeof route.query.search === 'string' ? route.query.search : '' })
 watch(() => route.query.search, (value) => {
   query.search = typeof value === 'string' ? value : ''
 })
-type CustomerRow = { id: string, name: string, email: string | null, phone: string | null, status: string, orders: number, loyaltyPoints: number }
+type CustomerRow = { id: string, name: string, email: string | null, phone: string | null, status: string, orders: number, loyaltyPoints: number, addressLine: string | null, addressCity: string | null }
 
 const { data: me } = await useFetch<{ data: { permissions: string[] } | null }>('/api/auth/me')
 const { data, refresh, pending } = await useFetch<{ data: CustomerRow[], meta: { total: number, pageSize: number } }>('/api/admin/customers', { query })
@@ -31,6 +31,7 @@ const columns: TableColumn<CustomerRow>[] = [
   { id: 'sn', header: 'SN' },
   { id: 'customer', header: 'Customer' },
   { accessorKey: 'phone', header: 'Phone' },
+  { id: 'address', header: 'Address' },
   { accessorKey: 'email', header: 'Email' },
   { accessorKey: 'orders', header: 'Orders' },
   { accessorKey: 'status', header: 'Status' },
@@ -58,18 +59,24 @@ function openEdit(customer: CustomerRow) {
   form.name = customer.name
   form.email = customer.email ?? ''
   form.phone = customer.phone ?? ''
-  form.line1 = ''
+  form.line1 = customer.addressLine ?? ''
+  form.city = customer.addressCity ?? ''
   open.value = true
 }
 
 async function saveCustomer() {
   error.value = ''
+  if (form.line1.trim().length < 3 || form.city.trim().length < 2) {
+    error.value = 'Enter the street and city.'
+    return
+  }
   saving.value = true
+  const address = { line1: form.line1.trim(), city: form.city.trim() }
   try {
     if (editing.value) {
       await $fetch(`/api/admin/customers/${editing.value.id}`, {
         method: 'PATCH',
-        body: { name: form.name, phone: form.phone || null }
+        body: { name: form.name, phone: form.phone || null, address }
       })
       notify('Customer updated.')
     } else {
@@ -79,7 +86,7 @@ async function saveCustomer() {
           name: form.name,
           email: form.email || undefined,
           phone: form.phone || undefined,
-          address: form.line1 ? { line1: form.line1, city: form.city || 'Kathmandu' } : undefined
+          address
         }
       })
       notify('Customer saved.')
@@ -157,6 +164,9 @@ async function setStatus(customer: CustomerRow) {
         </template>
         <template #phone-cell="{ row }">
           {{ row.original.phone || '—' }}
+        </template>
+        <template #address-cell="{ row }">
+          {{ row.original.addressLine ? `${row.original.addressLine}, ${row.original.addressCity}` : '—' }}
         </template>
         <template #email-cell="{ row }">
           {{ row.original.email || '—' }}
@@ -255,13 +265,23 @@ async function setStatus(customer: CustomerRow) {
         />
       </UFormField>
       <UFormField
-        v-if="!editing"
-        label="Address"
-        class="sm:col-span-2"
+        label="Street"
+        required
       >
         <UInput
           v-model="form.line1"
           class="w-full"
+          required
+        />
+      </UFormField>
+      <UFormField
+        label="City"
+        required
+      >
+        <UInput
+          v-model="form.city"
+          class="w-full"
+          required
         />
       </UFormField>
       <p

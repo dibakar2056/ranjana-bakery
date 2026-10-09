@@ -32,7 +32,7 @@ export function imageType(bytes: Uint8Array) {
   return null
 }
 
-export async function storeImage(folder: 'products' | 'categories' | 'users', ownerId: string, bytes: Uint8Array, type: string) {
+export async function storeImage(folder: 'products' | 'categories' | 'users' | 'orders', ownerId: string, bytes: Uint8Array, type: string) {
   const { client: s3, env } = storage()
   const ext = type === 'image/png' ? 'png' : type === 'image/webp' ? 'webp' : 'jpg'
   const key = `${folder}/${ownerId}/${crypto.randomUUID()}.${ext}`
@@ -44,7 +44,7 @@ export async function storeImage(folder: 'products' | 'categories' | 'users', ow
       ContentType: type
     }))
   } catch (error) {
-    logEvent('error', 'Could not store product image', {
+    logEvent('error', 'Could not store image', {
       name: error instanceof Error ? error.name : 'UnknownError'
     })
     throw createError({ statusCode: 502, statusMessage: 'Could not store the image.' })

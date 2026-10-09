@@ -17,7 +17,7 @@ type ProductRow = {
   status: string
 }
 
-const query = reactive({ page: 1, pageSize: 5, search: '' })
+const query = reactive({ page: 1, pageSize: 10, search: '' })
 const { data: me } = await useFetch<{ data: { permissions: string[] } | null }>('/api/auth/me')
 const { data, refresh, pending } = await useFetch<{ data: ProductRow[], meta: { total: number, pageSize: number } }>('/api/admin/products', { query })
 const { data: categories } = await useFetch<{ data: Array<{ id: string, name: string }> }>('/api/admin/categories', {
