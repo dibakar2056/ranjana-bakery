@@ -213,7 +213,8 @@ async function continueWithGoogle() {
             {{ notice }}
           </p>
           <form
-            class="auth-fields mt-8 space-y-4"
+            data-auth-fields
+            class="mt-8 space-y-4"
             @submit.prevent="mode === 'forgot' ? sendCode() : mode === 'code' ? resetPassword() : submit()"
           >
             <label
@@ -449,10 +450,10 @@ async function continueWithGoogle() {
 </template>
 
 <style scoped>
-.auth-fields :deep(input):-webkit-autofill,
-.auth-fields :deep(input):-webkit-autofill:hover,
-.auth-fields :deep(input):-webkit-autofill:focus,
-.auth-fields :deep(input):-webkit-autofill:active {
+[data-auth-fields] :deep(input):-webkit-autofill,
+[data-auth-fields] :deep(input):-webkit-autofill:hover,
+[data-auth-fields] :deep(input):-webkit-autofill:focus,
+[data-auth-fields] :deep(input):-webkit-autofill:active {
   -webkit-text-fill-color: #fff;
   caret-color: #fff;
   border-radius: 9999px;

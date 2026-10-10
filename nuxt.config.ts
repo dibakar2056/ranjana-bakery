@@ -11,16 +11,16 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
-  runtimeConfig: {
-    public: {
-      googleClientId: ''
-    }
-  },
-
   colorMode: {
     preference: 'light',
     fallback: 'light',
     storageKey: 'rb-theme'
+  },
+
+  runtimeConfig: {
+    public: {
+      googleClientId: ''
+    }
   },
 
   routeRules: {
