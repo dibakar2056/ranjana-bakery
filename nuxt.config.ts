@@ -17,6 +17,12 @@ export default defineNuxtConfig({
     storageKey: 'rb-theme'
   },
 
+  runtimeConfig: {
+    public: {
+      googleClientId: ''
+    }
+  },
+
   routeRules: {
     '/**': {
       headers: {

@@ -145,12 +145,23 @@ export async function requireSetupUser(event: Parameters<typeof getCookie>[0]) {
   return user
 }
 
-export async function loginWithPassword(event: Parameters<typeof setCookie>[0], username: string, password: string) {
+export async function loginWithPassword(
+  event: Parameters<typeof setCookie>[0],
+  username: string,
+  password: string,
+  portal: 'staff' | 'customer' = 'staff'
+) {
   const meta = requestMeta(event)
   await rateLimit(`login:ip:${meta.ip ?? 'unknown'}`, 20, 15 * 60)
   await rateLimit(`login:user:${username.toLowerCase()}`, 10, 15 * 60)
   const settings = await getSettings()
-  const user = await prisma.user.findUnique({ where: { username }, include: userInclude })
+  const loginId = username.trim()
+  const user = await prisma.user.findUnique({
+    where: portal === 'customer' && loginId.includes('@')
+      ? { email: loginId.toLowerCase() }
+      : { username: loginId },
+    include: userInclude
+  })
   const passwordOk = await verifyPassword(password, user?.passwordHash ?? null)
   if (!user || user.deletedAt) {
     await prisma.loginAttempt.create({ data: { username, success: false, ip: meta.ip } })
@@ -197,9 +208,16 @@ export async function loginWithPassword(event: Parameters<typeof setCookie>[0], 
     logEvent('info', 'Sign-in accepted', { username, userId: user.id, session: 'setup' })
     return { activationRequired: true, user: publicUser(toAuthUser(user, 'SETUP')) }
   }
-  if (!isStaffPortalRole(user.roles.map(item => item.role.key))) {
-    logEvent('warn', 'Sign-in rejected', { username, reason: 'not-staff' })
-    throw createError({ statusCode: 403, statusMessage: 'This sign-in is for staff accounts.' })
+  const roles = user.roles.map(item => item.role.key)
+  const customer = roles.includes('USER') && !isStaffPortalRole(roles)
+  if (portal === 'customer' ? !customer : !isStaffPortalRole(roles)) {
+    logEvent('warn', 'Sign-in rejected', { username, reason: portal === 'customer' ? 'not-customer' : 'not-staff' })
+    throw createError({
+      statusCode: portal === 'customer' ? 401 : 403,
+      statusMessage: portal === 'customer'
+        ? 'Invalid username or password.'
+        : 'This sign-in is for staff accounts.'
+    })
   }
   await startSession(event, user, 'FULL')
   logEvent('info', 'Sign-in accepted', { username, userId: user.id, session: 'full' })
