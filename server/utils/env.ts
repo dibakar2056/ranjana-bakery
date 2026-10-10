@@ -15,6 +15,7 @@ export function serverEnv() {
     r2PublicUrl: process.env.R2_PUBLIC_URL || '',
     sentryDsn: process.env.SENTRY_DSN || '',
     cronSecret: process.env.CRON_SECRET || '',
-    siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+    siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+    googleClientId: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID || ''
   }
 }
